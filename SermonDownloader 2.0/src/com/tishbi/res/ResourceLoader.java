@@ -75,6 +75,7 @@ public class ResourceLoader
 	private static String toolbarGotoFirstImage = "images/toolbarfirst.png";
 	private static String toolbarGotoPrevImage = "images/toolbarprev.png";
 	private static String toolbarPlayImage = "images/toolbarplay.png";
+	private static String toolbarStopImage = "images/toolbarstop.png";
 	private static String toolbarPauseImage = "images/toolbarpause.png";
 	private static String toolbarGotoNextImage = "images/toolbarnext.png";
 	private static String toolbarGotoLastImage = "images/toolbarlast.png";
@@ -94,6 +95,11 @@ public class ResourceLoader
 		return Toolkit.getDefaultToolkit().getImage(rl.getClass().getResource(toolbarPlayImage));
 	}
 	
+	public static Image toolbarStopImage()
+	{
+		return Toolkit.getDefaultToolkit().getImage(rl.getClass().getResource(toolbarStopImage));
+	}
+
 	public static Image toolbarPauseImage()
 	{
 		return Toolkit.getDefaultToolkit().getImage(rl.getClass().getResource(toolbarPauseImage));

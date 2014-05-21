@@ -98,31 +98,36 @@ public class SermonIndexCache
 	//toolbar images
 	public static ImageIcon toolbarGotoFirstImage()
 	{
-		return new ImageIcon(ResourceLoader.toolbarGotoFirstImage().getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH));
+		return new ImageIcon(ResourceLoader.toolbarGotoFirstImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
 	}
 	
 	public static ImageIcon toolbarGotoNextImage()
 	{
-		return new ImageIcon(ResourceLoader.toolbarGotoNextImage().getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH));
+		return new ImageIcon(ResourceLoader.toolbarGotoNextImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
 	}
 
 	public static ImageIcon toolbarPlayImage()
 	{
-		return new ImageIcon(ResourceLoader.toolbarPlayImage().getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH));
+		return new ImageIcon(ResourceLoader.toolbarPlayImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
 	}
 	
+	public static ImageIcon toolbarStopImage()
+	{
+		return new ImageIcon(ResourceLoader.toolbarStopImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
+	}
+
 	public static ImageIcon toolbarPauseImage()
 	{
-		return new ImageIcon(ResourceLoader.toolbarPauseImage().getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH));
+		return new ImageIcon(ResourceLoader.toolbarPauseImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
 	}
 	
 	public static ImageIcon toolbarGotoPreviousImage()
 	{
-		return new ImageIcon(ResourceLoader.toolbarGotoPreviousImage().getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH));
+		return new ImageIcon(ResourceLoader.toolbarGotoPreviousImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
 	}
 	
 	public static ImageIcon toolbarGotoLastImage()
 	{
-		return new ImageIcon(ResourceLoader.toolbarGotoLastImage().getScaledInstance(25, 25,  java.awt.Image.SCALE_SMOOTH));
+		return new ImageIcon(ResourceLoader.toolbarGotoLastImage().getScaledInstance(20, 20,  java.awt.Image.SCALE_SMOOTH));
 	}
 }

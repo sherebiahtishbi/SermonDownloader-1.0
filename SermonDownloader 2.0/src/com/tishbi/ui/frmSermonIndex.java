@@ -84,6 +84,14 @@ public class frmSermonIndex extends JFrame
 	private JLabel lblPlaying;
 	private JButton btnDownload;
 	private JButton btnUpdates;
+	private JToolBar tblPlayer;
+	private JButton btnFirst;
+	private JButton btnPrevious;
+	private JButton btnPlay;
+	private JButton btnPause;
+	private JButton btnStop;
+	private JButton btnNext;
+	private JButton btnLast;
 	
 	private ArrayList<Speaker> speakers = new ArrayList<Speaker>();
 	private ArrayList<Speaker> filteredList = new ArrayList<Speaker>();
@@ -183,14 +191,16 @@ public class frmSermonIndex extends JFrame
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		GridBagLayout gbl_contentPane = new GridBagLayout();
-		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
+		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
 		gbl_contentPane.columnWidths = new int[]{312, 333, 135};
-		gbl_contentPane.rowHeights = new int[]{20, 379, 20, 127, 14};
-		gbl_contentPane.rowWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0};
+		gbl_contentPane.rowHeights = new int[]{20, 20, 379, 20, 127, 14};
 		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 1.0};
 		contentPane.setLayout(gbl_contentPane);
 
 		setContentPane(contentPane);
+		
+		SetupPlayerToolBar();
+		
 		
 		lblPlaying = new JLabel();
 		lblPlaying.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -200,7 +210,7 @@ public class frmSermonIndex extends JFrame
 		gbc_lblPlaying.anchor = GridBagConstraints.NORTHWEST;
 		gbc_lblPlaying.insets = new Insets(0, 5, 5, 10);
 		gbc_lblPlaying.gridx = 0;
-		gbc_lblPlaying.gridy = 0;
+		gbc_lblPlaying.gridy = 1;
 		contentPane.add(lblPlaying, gbc_lblPlaying);
 		
 		lblSpeaker = new JLabel("");
@@ -210,7 +220,7 @@ public class frmSermonIndex extends JFrame
 		gbc_lblSpeaker.anchor = GridBagConstraints.EAST;
 		gbc_lblSpeaker.insets = new Insets(0, 0, 5, 10);
 		gbc_lblSpeaker.gridx = 2;
-		gbc_lblSpeaker.gridy = 0;
+		gbc_lblSpeaker.gridy = 1;
 		contentPane.add(lblSpeaker, gbc_lblSpeaker);
 		
 		JSplitPane splitPane = new JSplitPane();
@@ -220,7 +230,7 @@ public class frmSermonIndex extends JFrame
 		gbc_splitPane.insets = new Insets(0, 0, 5, 0);
 		gbc_splitPane.fill = GridBagConstraints.BOTH;
 		gbc_splitPane.gridx = 0;
-		gbc_splitPane.gridy = 1;
+		gbc_splitPane.gridy = 2;
 		contentPane.add(splitPane, gbc_splitPane);
 		
 		lstSpeakers = new JList(speakerModel);
@@ -245,7 +255,7 @@ public class frmSermonIndex extends JFrame
 		gbc_pnlFilter.insets = new Insets(0, 0, 5, 5);
 		gbc_pnlFilter.fill = GridBagConstraints.BOTH;
 		gbc_pnlFilter.gridx = 0;
-		gbc_pnlFilter.gridy = 2;
+		gbc_pnlFilter.gridy = 3;
 		contentPane.add(pnlFilter, gbc_pnlFilter);
 		
 		txtSearch = new JTextField();
@@ -258,14 +268,6 @@ public class frmSermonIndex extends JFrame
 		btnSearch.setIcon(SermonIndexCache.searchButtonImage());
 		pnlFilter.add(btnSearch);
 		
-		btnSearch.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent arg0) 
-			{
-				if (txtSearch.getText().trim().length() == 0 && speakerModel.size() == 0) return;
-				filterSpeakers();
-			}
-		});
 		
 		chkSelectAll = new JCheckBox("Select All");
 		chkSelectAll.setVerticalAlignment(SwingConstants.TOP);
@@ -276,7 +278,7 @@ public class frmSermonIndex extends JFrame
 		gbc_pnlSermonbuttons.anchor = GridBagConstraints.NORTHEAST;
 		gbc_pnlSermonbuttons.insets = new Insets(0, 0, 5, 0);
 		gbc_pnlSermonbuttons.gridx = 2;
-		gbc_pnlSermonbuttons.gridy = 2;
+		gbc_pnlSermonbuttons.gridy = 3;
 		pnlSermonbuttons.setLayout(new GridLayout(0, 3, 1, 1));
 		
 		btnDownload = new JButton("Start");
@@ -301,7 +303,7 @@ public class frmSermonIndex extends JFrame
 		gbc_scrollPaneLogs.insets = new Insets(0, 0, 5, 0);
 		gbc_scrollPaneLogs.gridwidth = 3;
 		gbc_scrollPaneLogs.gridx = 0;
-		gbc_scrollPaneLogs.gridy = 3;
+		gbc_scrollPaneLogs.gridy = 4;
 		scrollPaneLogs.setViewportView(txtLogs);
 		contentPane.add(scrollPaneLogs, gbc_scrollPaneLogs);
 		
@@ -312,7 +314,7 @@ public class frmSermonIndex extends JFrame
 		gbc_lblSermonIndex.anchor = GridBagConstraints.SOUTHWEST;
 		gbc_lblSermonIndex.insets = new Insets(0, 0, 0, 5);
 		gbc_lblSermonIndex.gridx = 0;
-		gbc_lblSermonIndex.gridy = 4;
+		gbc_lblSermonIndex.gridy = 5;
 		contentPane.add(lblSermonIndex, gbc_lblSermonIndex);
 		
 		JLabel lblOS = new JLabel("OS Information");
@@ -322,11 +324,11 @@ public class frmSermonIndex extends JFrame
 		gbc_lblOs.gridwidth = 2;
 		gbc_lblOs.anchor = GridBagConstraints.EAST;
 		gbc_lblOs.gridx = 1;
-		gbc_lblOs.gridy = 4;
+		gbc_lblOs.gridy = 5;
 		contentPane.add(lblOS, gbc_lblOs);
 		lblOS.setText("Operating System : " + Globals.getOS());
 		
-		
+		Logger.Log("Initial UI setup is done.");
 
 		
 		mntmSyncupWithWebsite.addActionListener(new ActionListener() 
@@ -338,7 +340,7 @@ public class frmSermonIndex extends JFrame
 			}
 		});
 
-		
+	
 		chkSelectAll.setEnabled(false);
 		chkSelectAll.addActionListener(new ActionListener() 
 		{
@@ -369,9 +371,15 @@ public class frmSermonIndex extends JFrame
 		});
 
 		
-		
-		
-		Logger.Log("Initial UI setup is done.");
+		btnSearch.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				if (txtSearch.getText().trim().length() == 0 && speakerModel.size() == 0) return;
+				filterSpeakers();
+			}
+		});
+
 		
 		final Date startTime = new Date();
 		if (SermonIndexCache.isLocalCacheOfSpeakersAvailable())
@@ -665,6 +673,48 @@ public class frmSermonIndex extends JFrame
 				}
 			}
 		});
+	}
+	
+	private void SetupPlayerToolBar()
+	{
+		tblPlayer = new JToolBar();
+		tblPlayer.setFloatable(false);
+		GridBagConstraints gbc_tblPlayer = new GridBagConstraints();
+		gbc_tblPlayer.gridwidth = 3;
+		gbc_tblPlayer.insets = new Insets(0, 0, 5, 5);
+		gbc_tblPlayer.gridx = 0;
+		gbc_tblPlayer.gridy = 0;
+		
+		btnFirst = new JButton("");
+		btnFirst.setIcon(SermonIndexCache.toolbarGotoFirstImage());
+		
+		btnPrevious = new JButton("");
+		btnPrevious.setIcon(SermonIndexCache.toolbarGotoPreviousImage());
+		
+		btnPlay = new JButton("");
+		btnPlay.setIcon(SermonIndexCache.toolbarPlayImage());
+		
+		btnStop = new JButton("");
+		btnStop.setIcon(SermonIndexCache.toolbarStopImage());
+		
+		btnPause = new JButton("");
+		btnPause.setIcon(SermonIndexCache.toolbarPauseImage());
+		
+		btnNext = new JButton("");
+		btnNext.setIcon(SermonIndexCache.toolbarGotoNextImage());
+		
+		btnLast = new JButton("");
+		btnLast.setIcon(SermonIndexCache.toolbarGotoLastImage());
+
+		tblPlayer.add(btnFirst);
+		tblPlayer.add(btnPrevious);
+		tblPlayer.add(btnPlay);
+		tblPlayer.add(btnPause);
+		tblPlayer.add(btnStop);
+		tblPlayer.add(btnNext);
+		tblPlayer.add(btnLast);
+		
+		contentPane.add(tblPlayer, gbc_tblPlayer);
 	}
 	
 	private void ShowSermons(ArrayList<Sermon> _sermons)
