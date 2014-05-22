@@ -264,6 +264,7 @@ public class frmSermonIndex extends JFrame
 		txtSearch.setColumns(10);
 		
 		JButton btnSearch = new JButton("Search");
+		btnSearch.setToolTipText("Search speaker ");
 		btnSearch.setBounds(194, 0, 89, 26);
 		btnSearch.setIcon(SermonIndexCache.searchButtonImage());
 		pnlFilter.add(btnSearch);
@@ -282,9 +283,11 @@ public class frmSermonIndex extends JFrame
 		pnlSermonbuttons.setLayout(new GridLayout(0, 3, 1, 1));
 		
 		btnDownload = new JButton("Start");
+		btnDownload.setToolTipText("Start downloading selected sermons");
 		btnDownload.setIcon(SermonIndexCache.downloadButtonImage());
 		
 		JButton btnFolders = new JButton("Open Sermon Folder");
+		btnFolders.setToolTipText("Open the folder location for selected speaker's sermons");
 		btnFolders.setIcon(SermonIndexCache.openFolderButtonImage());
 		pnlSermonbuttons.add(chkSelectAll);
 		pnlSermonbuttons.add(btnFolders);
@@ -690,24 +693,31 @@ public class frmSermonIndex extends JFrame
 		gbc_tblPlayer.gridy = 0;
 		
 		btnFirst = new JButton("");
+		btnFirst.setToolTipText("Start from beginning");
 		btnFirst.setIcon(SermonIndexCache.toolbarGotoFirstImage());
 		
 		btnPrevious = new JButton("");
+		btnPrevious.setToolTipText("Previous sermon/song");
 		btnPrevious.setIcon(SermonIndexCache.toolbarGotoPreviousImage());
 		
 		btnPlay = new JButton("");
+		btnPlay.setToolTipText("Start playing all selected sermons/songs");
 		btnPlay.setIcon(SermonIndexCache.toolbarPlayImage());
 		
 		btnStop = new JButton("");
+		btnStop.setToolTipText("Stop playback");
 		btnStop.setIcon(SermonIndexCache.toolbarStopImage());
 		
 		btnPause = new JButton("");
+		btnPause.setToolTipText("Pause playback");
 		btnPause.setIcon(SermonIndexCache.toolbarPauseImage());
 		
 		btnNext = new JButton("");
+		btnNext.setToolTipText("Play next sermon/song");
 		btnNext.setIcon(SermonIndexCache.toolbarGotoNextImage());
 		
 		btnLast = new JButton("");
+		btnLast.setToolTipText("Go to last sermon/song");
 		btnLast.setIcon(SermonIndexCache.toolbarGotoLastImage());
 
 		tblPlayer.add(btnFirst);
@@ -800,7 +810,7 @@ public class frmSermonIndex extends JFrame
 		if (speakerModel != null)
 		{
 			Logger.Log("Adding SearchListener.");
-			txtSearch.getDocument().addDocumentListener(new SearchListener(speakerModel));
+			//txtSearch.getDocument().addDocumentListener(new SearchListener(speakerModel));
 		}
 	}
 	
