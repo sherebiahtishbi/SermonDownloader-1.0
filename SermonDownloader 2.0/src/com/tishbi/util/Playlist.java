@@ -21,6 +21,8 @@ public class Playlist
 	private boolean playerStopped = false;
 	private SermonPlayer player;
 	private int playIndex=-1;
+	private int masterIndex;
+	private boolean trackChangedByUser = false;
 	
 	
 	public Playlist(ArrayList<Sermon> _playlist, JTable _sermonTable)
@@ -51,15 +53,17 @@ public class Playlist
 				Sermon _sermon;
 				if (playIndex == -1) playIndex=0;
 				Logger.Log("Before entering loop current playindex :" + playIndex);
-				StopCurrentTrack();
+				//StopCurrentTrack();
 				for(int i = playIndex; i < playList.size(); i++)
 				{
+					masterIndex = i;
 					_sermon = playList.get(i);
 					if (playerStopped) break;
-					Logger.Log("In loop, Current playindex : " + playIndex + ", loop counter : " + i);
+					Logger.Log("Current playindex : " + playIndex + ", Master Index : " + masterIndex);
 					_sermon.Status = DownloadStatus.PLAYING;
 					((SermonTableModel)sermonTable.getModel()).setDownloadStatus(_sermon);
 					sermonTable.repaint();
+					StopCurrentTrack();
 					player = new SermonPlayer(_sermon);
 					Logger.Log("Now playing : "+_sermon.Title);
 					pcs.firePropertyChange("currentplayback",null, _sermon);
@@ -80,7 +84,13 @@ public class Playlist
 			@Override
 			protected void done()
 			{
-				Stop();
+				if (masterIndex == playList.size()-1)
+				{
+					Logger.Log("Playlist done.");
+					Stop();
+				}
+				else
+					Logger.Log("Playback interrupted by user.");
 			}
 			
 		};
@@ -123,6 +133,7 @@ public class Playlist
 	{
 		if (playList == null || playIndex == -1) return;
 		playIndex=0;
+		trackChangedByUser = true;
 		Play();
 	}
 	
@@ -130,6 +141,7 @@ public class Playlist
 	{
 		if (playList == null || playIndex == -1) return;
 		--playIndex;
+		trackChangedByUser = true;
 		Play();
 	}
 
@@ -137,8 +149,9 @@ public class Playlist
 	{
 		System.out.println("Next button Pressed");
 		if (playList == null || playIndex == -1) return;
-		StopCurrentTrack();
+		//StopCurrentTrack();
 		++playIndex;
+		trackChangedByUser = true;
 		Play();
 	}
 	
@@ -146,13 +159,8 @@ public class Playlist
 	{
 		if (playList == null || playIndex == -1) return;
 		playIndex = playList.size()-1;
+		trackChangedByUser = true;
 		Play();
-	}
-	
-	private void playtrack()
-	{
-		if (playList == null || playIndex == -1) return;
-		
 	}
 	
 	private void StopCurrentTrack()

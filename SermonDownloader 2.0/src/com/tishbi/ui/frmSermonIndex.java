@@ -193,14 +193,13 @@ public class frmSermonIndex extends JFrame
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 0.0};
 		gbl_contentPane.columnWidths = new int[]{312, 333, 135};
-		gbl_contentPane.rowHeights = new int[]{20, 20, 379, 20, 127, 14};
+		gbl_contentPane.rowHeights = new int[]{20, 24, 379, 20, 127, 14};
 		gbl_contentPane.columnWeights = new double[]{1.0, 0.0, 1.0};
 		contentPane.setLayout(gbl_contentPane);
 
 		setContentPane(contentPane);
 		
 		SetupPlayerToolBar();
-		
 		
 		lblPlaying = new JLabel();
 		lblPlaying.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -260,6 +259,7 @@ public class frmSermonIndex extends JFrame
 		
 		txtSearch = new JTextField();
 		txtSearch.setBounds(0, 0, 184, 26);
+		
 		pnlFilter.add(txtSearch);
 		txtSearch.setColumns(10);
 		
@@ -412,45 +412,48 @@ public class frmSermonIndex extends JFrame
 		
 		//Player toolbar 
 		
-//		btnPlay.addActionListener(new ActionListener() 
-//		{
-//			public void actionPerformed(ActionEvent arg0) 
-//			{
-//				if (playlist != null) playlist.Stop();
-//				playlist = null;
-//				for (Sermon _sermon : sermons)
-//				{
-//					if (_sermon.isSermonSelected)
-//					{
-//						if (playlist == null)
-//							playlist = new Playlist(tblSermons);
-//						
-//						playlist.Add(_sermon);
-//					}
-//				}
-//				if (playlist != null)
-//					playlist.Play();
-//				else
-//					Utilities.ShowMessage("No sermon or song selected to play.", "Empty playlist");
-//			}
-//		});
-//		
-//		btnPause.addActionListener(new ActionListener() 
-//		{
-//			public void actionPerformed(ActionEvent arg0) 
-//			{
-//				if (playlist != null) playlist.Stop();
-//			}
-//		});
-//		
-//		btnNext.addActionListener(new ActionListener() 
-//		{
-//			public void actionPerformed(ActionEvent arg0) 
-//			{
-//				if (playlist == null) return;
-//				playlist.Next();
-//			}
-//		});
+		btnPlay.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				if (playlist != null) playlist.Stop();
+				playlist = null;
+				for (Sermon _sermon : sermons)
+				{
+					if (_sermon.isSermonSelected)
+					{
+						if (playlist == null)
+							playlist = new Playlist(tblSermons);
+						
+						playlist.Add(_sermon);
+					}
+				}
+				if (playlist != null)
+				{
+					playlist.addPropertyChangeListener(new PlaybackListener(lblPlaying));
+					playlist.Play();
+				}
+				else
+					Utilities.ShowMessage("No sermon or song selected to play.", "Empty playlist");
+			}
+		});
+		
+		btnPause.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				if (playlist != null) playlist.Stop();
+			}
+		});
+		
+		btnNext.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				if (playlist == null) return;
+				playlist.Next();
+			}
+		});
 
 		
 		
@@ -680,6 +683,7 @@ public class frmSermonIndex extends JFrame
 		tblPlayer = new JToolBar();
 		tblPlayer.setFloatable(false);
 		GridBagConstraints gbc_tblPlayer = new GridBagConstraints();
+		gbc_tblPlayer.anchor = GridBagConstraints.NORTH;
 		gbc_tblPlayer.gridwidth = 3;
 		gbc_tblPlayer.insets = new Insets(0, 0, 5, 5);
 		gbc_tblPlayer.gridx = 0;
@@ -793,6 +797,11 @@ public class frmSermonIndex extends JFrame
 		}
 		scrollPaneSpeakers.setViewportBorder(new TitledBorder(null, "Speakers (" + speakerModel.size() + ")" , TitledBorder.LEFT, TitledBorder.TOP, null, null));
 		lstSpeakers.setModel(speakerModel);
+		if (speakerModel != null)
+		{
+			Logger.Log("Adding SearchListener.");
+			txtSearch.getDocument().addDocumentListener(new SearchListener(speakerModel));
+		}
 	}
 	
 	private void BuildSpeakersFromLocalCache()
