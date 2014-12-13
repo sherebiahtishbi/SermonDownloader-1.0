@@ -32,6 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JMenu;
 
+import com.sun.glass.events.KeyEvent;
 import com.tishbi.sitecontent.AllEnums.UpdateStatus;
 import com.tishbi.sitecontent.Downloader;
 import com.tishbi.sitecontent.Sermon;
@@ -147,11 +148,32 @@ public class frmSermonIndex extends JFrame
 		screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 		setLocation((screenWidth-getWidth())/2,100);
 		
+		//menu components
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(new Color(128, 128, 0));
 		setJMenuBar(menuBar);
 		
+		JMenu mnFile = new JMenu("File");
+		mnFile.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(mnFile);
+		
+		JMenuItem mntmFileExit = new JMenuItem("Exit");
+		mntmFileExit.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent arg0) {
+		    	int dec = Utilities.Confirm("Are you sure you want to exit the SermonIndex Downloader?", "Exit");
+				if (dec == JOptionPane.YES_OPTION)
+					System.exit(0);
+		    }
+		    
+		});
+		mntmFileExit.setMnemonic(KeyEvent.VK_X);
+		mnFile.add(mntmFileExit);	
+		
+		
 		JMenu mnData = new JMenu("Data");
+		mnData.setMnemonic(KeyEvent.VK_D);
 		menuBar.add(mnData);
 		
 		JMenuItem mntmSyncupWithWebsite = new JMenuItem("Check for Updates");
@@ -159,8 +181,9 @@ public class frmSermonIndex extends JFrame
 		mntmSyncupWithWebsite.setToolTipText("<html>This will syncup the local Cached data of selected speaker<br> with website, if no speaker is selected <br>than list of speakers will be rebuilt. <br><br><b>This operation may take several minutes.</b></html>");
 		mnData.add(mntmSyncupWithWebsite);
 		
-		JMenu mnuAbout = new JMenu("About");
-		menuBar.add(mnuAbout);
+		JMenu mnuHelp = new JMenu("Help");
+		mnuHelp.setMnemonic(KeyEvent.VK_H);
+		menuBar.add(mnuHelp);
 		
 		JMenuItem mntmAbout = new JMenuItem("About SermonIndex.net");
 		mntmAbout.addActionListener(new ActionListener() 
@@ -172,20 +195,8 @@ public class frmSermonIndex extends JFrame
 				about.setVisible(true);		
 			}
 		});
-		mnuAbout.add(mntmAbout);
-		
-		JMenu mnExit = new JMenu("Exit");
-		mnExit.addMouseListener(new MouseAdapter() 
-		{
-			@Override
-			public void mouseClicked(MouseEvent arg0) 
-			{
-				int dec = Utilities.Confirm("Are you sure you want to exit the SermonIndex Downloader?", "Exit");
-				if (dec == JOptionPane.YES_OPTION)
-					System.exit(0);
-			}
-		});
-		menuBar.add(mnExit);
+		mntmAbout.setMnemonic(KeyEvent.VK_A);
+		mnuHelp.add(mntmAbout);		
 
 		
 		contentPane = new JPanel();
