@@ -16,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -481,7 +482,7 @@ public class frmSermonIndex extends JFrame
 				if (player != null) player.Stop();
 				
 				int index = lstSpeakers.locationToIndex(e.getPoint());
-				if (index != -1)
+				if (index != -1 && SwingUtilities.isLeftMouseButton(e))
 				{
 					selectedSpeaker = (Speaker) lstSpeakers.getModel().getElementAt(index);
 					lblSpeaker.setText(selectedSpeaker.Name);
