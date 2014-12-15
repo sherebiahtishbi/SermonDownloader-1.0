@@ -570,77 +570,11 @@ public class frmSermonIndex extends JFrame
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				boolean sermonSelected = false;
-				if (sermons.isEmpty())
-				{
-					Utilities.ShowMessage("There are no sermons to download", "Missing Information");
-					return;
-				}
-				selectedSermons = ((SermonTableModel)tblSermons.getModel()).getSermons();
-				for (Sermon _sermon : selectedSermons)
-				{
-					if (_sermon.isSermonSelected)
-					{
-						_sermon.Status = DownloadStatus.DOWNLOADING;
-						_sermon.Speaker = lblSpeaker.getText();
-						sermonSelected = true;
-					}
-				}
-				if (!sermonSelected)
-				{
-					Utilities.ShowMessage("No sermon selected to download.", "Missing Information");
-					return;
-				}
-				ShowSermons(selectedSermons);
-				
-				
-	            final Date d = new Date();
-	            try
-	            {
-	            	txtLogs.append("Started downloading at : " + d.toString()+"\n========================\n");
-		            SwingWorker<Date,Sermon> worker = new SwingWorker<Date,Sermon>()
-		            {
-						@Override
-						protected Date doInBackground() throws Exception 
-						{
-							for(final Sermon _sermon : selectedSermons)
-							{
-								if (!_sermon.isSermonSelected) continue;
-								_sermon.Status = Downloader.Download(_sermon);
-								publish(_sermon);
-							}
-							return new Date();
-						}
-	
-						@Override
-						protected void done() 
-						{
-							txtLogs.append("=======================================\n");
-			                txtLogs.append("Completed downloading. Total time taken : " + Utilities.TimeTaken(d)+"\n");
-			                btnDownload.setEnabled(true);
-			            }
-	
-						@Override
-						protected void process(List<Sermon> sermons) 
-						{
-							for(Sermon _sermon : sermons)
-							{
-								((SermonTableModel)tblSermons.getModel()).setDownloadStatus(_sermon);
-								txtLogs.append(_sermon.Title + 
-										"(" + _sermon.Length + 
-										") -> "+ _sermon.getStatus() + "\n");
-							}
-							tblSermons.repaint();
-						}
-		            };
-		            worker.execute();
-	            }
-	            catch(Exception ex)
-	            {
-	            	ex.printStackTrace();
-	            }
+				downloadSelectedSermons();
 			}
 		});
+		
+		
 		
 		tblSermons.addMouseMotionListener(new MouseMotionAdapter() 
 		{
@@ -677,6 +611,17 @@ public class frmSermonIndex extends JFrame
 				}
 				if (col == 4 && _sermon != null)
 				{
+					// check to see if sermon has been downloaded before playing in player
+					if(_sermon.Status == DownloadStatus.NOT_STARTED || _sermon.Status == DownloadStatus.FAILED) {
+						int dec = Utilities.Confirm("You must first download the sermon. Would you like to download it?","Download Sermon");
+						if (dec == JOptionPane.YES_OPTION) {
+							SermonTableModel model = (SermonTableModel)tblSermons.getModel();
+							model.setValueAt(true, row, 3);
+							downloadSelectedSermons();
+						}
+						return;
+					}
+						
 					if (playlist != null)
 					{
 						Sermon currSermon = playlist.currentlyPlaying();
@@ -691,6 +636,78 @@ public class frmSermonIndex extends JFrame
 				}
 			}
 		});
+	}
+	
+	private void downloadSelectedSermons() {
+		boolean sermonSelected = false;
+		if (sermons.isEmpty())
+		{
+			Utilities.ShowMessage("There are no sermons to download", "Missing Information");
+			return;
+		}
+		selectedSermons = ((SermonTableModel)tblSermons.getModel()).getSermons();
+		for (Sermon _sermon : selectedSermons)
+		{
+			if (_sermon.isSermonSelected)
+			{
+				_sermon.Status = DownloadStatus.DOWNLOADING;
+				_sermon.Speaker = lblSpeaker.getText();
+				sermonSelected = true;
+			}
+		}
+		if (!sermonSelected)
+		{
+			Utilities.ShowMessage("No sermon selected to download.", "Missing Information");
+			return;
+		}
+		ShowSermons(selectedSermons);
+		
+		
+        final Date d = new Date();
+        try
+        {
+        	txtLogs.append("Started downloading at : " + d.toString()+"\n========================\n");
+            SwingWorker<Date,Sermon> worker = new SwingWorker<Date,Sermon>()
+            {
+				@Override
+				protected Date doInBackground() throws Exception 
+				{
+					for(final Sermon _sermon : selectedSermons)
+					{
+						if (!_sermon.isSermonSelected) continue;
+						_sermon.Status = Downloader.Download(_sermon);
+						publish(_sermon);
+					}
+					return new Date();
+				}
+
+				@Override
+				protected void done() 
+				{
+					txtLogs.append("=======================================\n");
+	                txtLogs.append("Completed downloading. Total time taken : " + Utilities.TimeTaken(d)+"\n");
+	                btnDownload.setEnabled(true);
+	            }
+
+				@Override
+				protected void process(List<Sermon> sermons) 
+				{
+					for(Sermon _sermon : sermons)
+					{
+						((SermonTableModel)tblSermons.getModel()).setDownloadStatus(_sermon);
+						txtLogs.append(_sermon.Title + 
+								"(" + _sermon.Length + 
+								") -> "+ _sermon.getStatus() + "\n");
+					}
+					tblSermons.repaint();
+				}
+            };
+            worker.execute();
+        }
+        catch(Exception ex)
+        {
+        	ex.printStackTrace();
+        }
 	}
 	
 	private void SetupPlayerToolBar()
