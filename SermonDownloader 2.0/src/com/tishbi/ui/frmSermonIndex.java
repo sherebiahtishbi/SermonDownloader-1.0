@@ -16,6 +16,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -32,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JMenu;
 
+import com.sun.glass.events.KeyEvent;
 import com.tishbi.sitecontent.AllEnums.UpdateStatus;
 import com.tishbi.sitecontent.Downloader;
 import com.tishbi.sitecontent.Sermon;
@@ -147,11 +149,32 @@ public class frmSermonIndex extends JFrame
 		screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 		setLocation((screenWidth-getWidth())/2,100);
 		
+		//menu components
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBackground(new Color(128, 128, 0));
 		setJMenuBar(menuBar);
 		
+		JMenu mnFile = new JMenu("File");
+		mnFile.setMnemonic(KeyEvent.VK_F);
+		menuBar.add(mnFile);
+		
+		JMenuItem mntmFileExit = new JMenuItem("Exit");
+		mntmFileExit.addActionListener(new ActionListener() {
+
+		    @Override
+		    public void actionPerformed(ActionEvent arg0) {
+		    	int dec = Utilities.Confirm("Are you sure you want to exit the SermonIndex Downloader?", "Exit");
+				if (dec == JOptionPane.YES_OPTION)
+					System.exit(0);
+		    }
+		    
+		});
+		mntmFileExit.setMnemonic(KeyEvent.VK_X);
+		mnFile.add(mntmFileExit);	
+		
+		
 		JMenu mnData = new JMenu("Data");
+		mnData.setMnemonic(KeyEvent.VK_D);
 		menuBar.add(mnData);
 		
 		JMenuItem mntmSyncupWithWebsite = new JMenuItem("Check for Updates");
@@ -159,8 +182,9 @@ public class frmSermonIndex extends JFrame
 		mntmSyncupWithWebsite.setToolTipText("<html>This will syncup the local Cached data of selected speaker<br> with website, if no speaker is selected <br>than list of speakers will be rebuilt. <br><br><b>This operation may take several minutes.</b></html>");
 		mnData.add(mntmSyncupWithWebsite);
 		
-		JMenu mnuAbout = new JMenu("About");
-		menuBar.add(mnuAbout);
+		JMenu mnuHelp = new JMenu("Help");
+		mnuHelp.setMnemonic(KeyEvent.VK_H);
+		menuBar.add(mnuHelp);
 		
 		JMenuItem mntmAbout = new JMenuItem("About SermonIndex.net");
 		mntmAbout.addActionListener(new ActionListener() 
@@ -172,20 +196,8 @@ public class frmSermonIndex extends JFrame
 				about.setVisible(true);		
 			}
 		});
-		mnuAbout.add(mntmAbout);
-		
-		JMenu mnExit = new JMenu("Exit");
-		mnExit.addMouseListener(new MouseAdapter() 
-		{
-			@Override
-			public void mouseClicked(MouseEvent arg0) 
-			{
-				int dec = Utilities.Confirm("Are you sure you want to exit the SermonIndex Downloader?", "Exit");
-				if (dec == JOptionPane.YES_OPTION)
-					System.exit(0);
-			}
-		});
-		menuBar.add(mnExit);
+		mntmAbout.setMnemonic(KeyEvent.VK_A);
+		mnuHelp.add(mntmAbout);		
 
 		
 		contentPane = new JPanel();
@@ -470,7 +482,7 @@ public class frmSermonIndex extends JFrame
 				if (player != null) player.Stop();
 				
 				int index = lstSpeakers.locationToIndex(e.getPoint());
-				if (index != -1)
+				if (index != -1 && SwingUtilities.isLeftMouseButton(e))
 				{
 					selectedSpeaker = (Speaker) lstSpeakers.getModel().getElementAt(index);
 					lblSpeaker.setText(selectedSpeaker.Name);
@@ -558,77 +570,11 @@ public class frmSermonIndex extends JFrame
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				boolean sermonSelected = false;
-				if (sermons.isEmpty())
-				{
-					Utilities.ShowMessage("There are no sermons to download", "Missing Information");
-					return;
-				}
-				selectedSermons = ((SermonTableModel)tblSermons.getModel()).getSermons();
-				for (Sermon _sermon : selectedSermons)
-				{
-					if (_sermon.isSermonSelected)
-					{
-						_sermon.Status = DownloadStatus.DOWNLOADING;
-						_sermon.Speaker = lblSpeaker.getText();
-						sermonSelected = true;
-					}
-				}
-				if (!sermonSelected)
-				{
-					Utilities.ShowMessage("No sermon selected to download.", "Missing Information");
-					return;
-				}
-				ShowSermons(selectedSermons);
-				
-				
-	            final Date d = new Date();
-	            try
-	            {
-	            	txtLogs.append("Started downloading at : " + d.toString()+"\n========================\n");
-		            SwingWorker<Date,Sermon> worker = new SwingWorker<Date,Sermon>()
-		            {
-						@Override
-						protected Date doInBackground() throws Exception 
-						{
-							for(final Sermon _sermon : selectedSermons)
-							{
-								if (!_sermon.isSermonSelected) continue;
-								_sermon.Status = Downloader.Download(_sermon);
-								publish(_sermon);
-							}
-							return new Date();
-						}
-	
-						@Override
-						protected void done() 
-						{
-							txtLogs.append("=======================================\n");
-			                txtLogs.append("Completed downloading. Total time taken : " + Utilities.TimeTaken(d)+"\n");
-			                btnDownload.setEnabled(true);
-			            }
-	
-						@Override
-						protected void process(List<Sermon> sermons) 
-						{
-							for(Sermon _sermon : sermons)
-							{
-								((SermonTableModel)tblSermons.getModel()).setDownloadStatus(_sermon);
-								txtLogs.append(_sermon.Title + 
-										"(" + _sermon.Length + 
-										") -> "+ _sermon.getStatus() + "\n");
-							}
-							tblSermons.repaint();
-						}
-		            };
-		            worker.execute();
-	            }
-	            catch(Exception ex)
-	            {
-	            	ex.printStackTrace();
-	            }
+				downloadSelectedSermons();
 			}
 		});
+		
+		
 		
 		tblSermons.addMouseMotionListener(new MouseMotionAdapter() 
 		{
@@ -665,6 +611,17 @@ public class frmSermonIndex extends JFrame
 				}
 				if (col == 4 && _sermon != null)
 				{
+					// check to see if sermon has been downloaded before playing in player
+					if(_sermon.Status == DownloadStatus.NOT_STARTED || _sermon.Status == DownloadStatus.FAILED) {
+						int dec = Utilities.Confirm("You must first download the sermon. Would you like to download it?","Download Sermon");
+						if (dec == JOptionPane.YES_OPTION) {
+							SermonTableModel model = (SermonTableModel)tblSermons.getModel();
+							model.setValueAt(true, row, 3);
+							downloadSelectedSermons();
+						}
+						return;
+					}
+						
 					if (playlist != null)
 					{
 						Sermon currSermon = playlist.currentlyPlaying();
@@ -679,6 +636,78 @@ public class frmSermonIndex extends JFrame
 				}
 			}
 		});
+	}
+	
+	private void downloadSelectedSermons() {
+		boolean sermonSelected = false;
+		if (sermons.isEmpty())
+		{
+			Utilities.ShowMessage("There are no sermons to download", "Missing Information");
+			return;
+		}
+		selectedSermons = ((SermonTableModel)tblSermons.getModel()).getSermons();
+		for (Sermon _sermon : selectedSermons)
+		{
+			if (_sermon.isSermonSelected)
+			{
+				_sermon.Status = DownloadStatus.DOWNLOADING;
+				_sermon.Speaker = lblSpeaker.getText();
+				sermonSelected = true;
+			}
+		}
+		if (!sermonSelected)
+		{
+			Utilities.ShowMessage("No sermon selected to download.", "Missing Information");
+			return;
+		}
+		ShowSermons(selectedSermons);
+		
+		
+        final Date d = new Date();
+        try
+        {
+        	txtLogs.append("Started downloading at : " + d.toString()+"\n========================\n");
+            SwingWorker<Date,Sermon> worker = new SwingWorker<Date,Sermon>()
+            {
+				@Override
+				protected Date doInBackground() throws Exception 
+				{
+					for(final Sermon _sermon : selectedSermons)
+					{
+						if (!_sermon.isSermonSelected) continue;
+						_sermon.Status = Downloader.Download(_sermon);
+						publish(_sermon);
+					}
+					return new Date();
+				}
+
+				@Override
+				protected void done() 
+				{
+					txtLogs.append("=======================================\n");
+	                txtLogs.append("Completed downloading. Total time taken : " + Utilities.TimeTaken(d)+"\n");
+	                btnDownload.setEnabled(true);
+	            }
+
+				@Override
+				protected void process(List<Sermon> sermons) 
+				{
+					for(Sermon _sermon : sermons)
+					{
+						((SermonTableModel)tblSermons.getModel()).setDownloadStatus(_sermon);
+						txtLogs.append(_sermon.Title + 
+								"(" + _sermon.Length + 
+								") -> "+ _sermon.getStatus() + "\n");
+					}
+					tblSermons.repaint();
+				}
+            };
+            worker.execute();
+        }
+        catch(Exception ex)
+        {
+        	ex.printStackTrace();
+        }
 	}
 	
 	private void SetupPlayerToolBar()
